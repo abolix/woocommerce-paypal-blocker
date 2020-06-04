@@ -3,10 +3,10 @@
 /**
  * Plugin Name: Paypal Email Blocker
  * Plugin URI: https://github.com/abolix/woocommerce-paypal-blocker
- * Description: this plugin will block the delivering of product if the paypal addesss is set to be blocked
+ * Description: this plugin will block the delivering of product if the sender paypal addesss is set to be blocked
  * Version: 1.0
  * Author: Abolix
- * Author URI: https://github.com/abolix/woocommerce-paypal-blocker
+ * Author URI: https://github.com/abolix/
  */
 
 // Register a custom menu page.
@@ -65,13 +65,6 @@ function AddAdminPage()
 <?php
 } // End of AdminPage function
 
-
-add_action('admin_menu', 'AddWordPressMenu');
-add_action('admin_init', 'RegisterFields');
-
-
-
-add_action('valid-paypal-standard-ipn-request', 'OnIPNhook', 9);
 function OnIPNhook($posted)
 {
     // if (!empty($posted['custom']) && ($order = GetPayPalOrder($posted['custom']))) {
@@ -92,7 +85,6 @@ function OnIPNhook($posted)
 function onOrderComplete($OrderID)
 {
     $BannedPaypals = explode(PHP_EOL, get_option('PPbanList'));
-    $JSP = json_encode($BannedPaypals);
     $SenderPayPal = get_post_meta($OrderID, 'Sender_Paypal', true); // Beacuse of Single = true , it will return string
     foreach ($BannedPaypals as $BannedPaypal) {
         $BannedPaypal = str_replace('\r', '', $BannedPaypal);
@@ -113,4 +105,9 @@ function onOrderComplete($OrderID)
         }
     }
 }
+
+
 add_action('woocommerce_order_status_completed', 'onOrderComplete', 10, 1);
+add_action('admin_menu', 'AddWordPressMenu');
+add_action('admin_init', 'RegisterFields');
+add_action('valid-paypal-standard-ipn-request', 'OnIPNhook', 9);
